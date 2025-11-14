@@ -3,6 +3,7 @@ import numpy as np
 from dataclasses import dataclass
 import re
 import os
+import shutil
 
 @dataclass
 class DataFrames_Obj:
@@ -239,6 +240,9 @@ def merge_feature_with_empty_base(df_obj: DataFrames_Obj, exclude_df_name: list 
     return merged_df
 
 def check_merge(df_final: pd.DataFrame, df_obj: DataFrames_Obj, output_dir="merge_check_results"):
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)
+    
     os.makedirs(output_dir, exist_ok=True)
 
     df_final_keys = df_final[['iso_code', 'year']].drop_duplicates()
