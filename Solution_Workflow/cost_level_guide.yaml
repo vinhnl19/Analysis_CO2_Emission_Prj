@@ -1,0 +1,21 @@
+cost_levels:
+  1:
+    meaning: "Rất dễ, chi phí thấp, thay đổi nhanh."
+    one_year_change: "Có (rất khả thi)"
+    max_change_pct: 50
+  2:
+    meaning: "Dễ, chi phí thấp đến trung bình."
+    one_year_change: "Có"
+    max_change_pct: 30
+  3:
+    meaning: "Trung bình, chi phí vừa, thay đổi được nhưng có giới hạn."
+    one_year_change: "Có nhưng hạn chế"
+    max_change_pct: 15
+  4:
+    meaning: "Khó, chi phí cao, cần tái cấu trúc."
+    one_year_change: "Hạn chế (thay đổi được một phần nhỏ)"
+    max_change_pct: 5
+  5:
+    meaning: "Rất khó, hầu như không thể thay đổi trong 1 năm."
+    one_year_change: "Gần như không"
+    max_change_pct: 0

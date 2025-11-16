@@ -1,0 +1,39 @@
+workflow:
+  - step: "select_country"
+    description: "User chọn quốc gia trong danh sách"
+    input_type: "dropdown"
+    output_var: "country_id"
+
+  - step: "select_year"
+    description: "User chọn năm cần dự đoán CO2"
+    input_type: "dropdown"
+    constraints: "year <= current_year + 1"
+    output_var: "target_year"
+
+  - step: "load_sequence_data"
+    description: "Load 3 năm feature + CO2 trước năm dự đoán"
+    input_from: "dataset"
+    output_var: "sequence_data"
+    editable_by_user: true
+
+  - step: "predict_CO2"
+    description: "Dự đoán CO2 bằng model GRU"
+    model_file: "best_model_gru3.h5"
+    input_var: "sequence_data"
+    output_var: "predicted_CO2"
+
+  - step: "input_CO2_target"
+    description: "User nhập CO2 target"
+    input_type: "number"
+    output_var: "CO2_target"
+
+  - step: "select_changeable_features"
+    description: "User tick các feature có thể thay đổi và chọn cost"
+    input_type: "multi_select_with_cost"
+    output_var: "feature_cost_selection"
+
+  - step: "recommendation"
+    description: "Tính toán % thay đổi feature để đạt CO2 target"
+    model_type: "counterfactual_optimization"
+    input_vars: ["predicted_CO2", "feature_cost_selection"]
+    output_var: "feature_recommendation"
