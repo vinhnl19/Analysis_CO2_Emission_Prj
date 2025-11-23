@@ -5,7 +5,28 @@ from tensorflow.keras.models import load_model
 import joblib
 import numpy as np
 import yaml
+from ga_optimizer import ga_optimize_changes
 
+FEATURE = ['Co2_MtCO2',
+    'Population',
+    'GDP',
+    'Industry_on_GDP',
+    'Government_Expenditure_on_Education',
+    'Global_Climate_Risk_Index',
+    'HDI',
+    'Renewable_Energy_Percent',
+    'Deforest_Percent',
+    'Energy_Capita_kWh']
+FEATURE_CORE = [
+    'Population',
+    'GDP',
+    'Industry_on_GDP',
+    'Government_Expenditure_on_Education',
+    'Global_Climate_Risk_Index',
+    'HDI',
+    'Renewable_Energy_Percent',
+    'Deforest_Percent',
+    'Energy_Capita_kWh']
 
 def select_country(countries):
     print("Danh sách quốc gia:")
@@ -68,7 +89,8 @@ def select_changeable_features(features, cost_guide):
 def predict_co2(model, le, scaler, country_name, sequence_data_features):
     num_feature = int(sequence_data_features.shape[1])
 
-    seq_scaled = scaler.transform(sequence_data_features)
+    seq_df = pd.DataFrame(sequence_data_features, columns=FEATURE)
+    seq_scaled = scaler.transform(seq_df)
     X_new = np.expand_dims(seq_scaled, axis=0)
 
     if country_name not in le.classes_:
@@ -114,26 +136,6 @@ def main():
     le = joblib.load(le_path)
 
     countries = df['Country'].unique().tolist()
-    features = ['Co2_MtCO2',
-    'Population',
-    'GDP',
-    'Industry_on_GDP',
-    'Government_Expenditure_on_Education',
-    'Global_Climate_Risk_Index',
-    'HDI',
-    'Renewable_Energy_Percent',
-    'Deforest_Percent',
-    'Energy_Capita_kWh']
-    feature_core = [
-    'Population',
-    'GDP',
-    'Industry_on_GDP',
-    'Government_Expenditure_on_Education',
-    'Global_Climate_Risk_Index',
-    'HDI',
-    'Renewable_Energy_Percent',
-    'Deforest_Percent',
-    'Energy_Capita_kWh']
 
     # 2. User chọn country & year
     country = select_country(countries)
@@ -142,7 +144,7 @@ def main():
     # 3. Load sequence data
     seq_data = load_sequence_data(df, country, year)
     # Giả lập: tách feature và CO2 cho predict
-    seq_features = seq_data[features].to_numpy()
+    seq_features = seq_data[FEATURE].to_numpy()
 
     # 4. Predict CO2
     predicted_co2 = predict_co2(model, le, scaler, country_name=country, sequence_data_features=seq_features)
@@ -152,10 +154,39 @@ def main():
     co2_target = input_co2_target()
 
     # 6. User chọn feature có thể thay đổi + cost
-    feature_selection = select_changeable_features(feature_core, cost_guide)
+    feature_selection = select_changeable_features(FEATURE_CORE, cost_guide)
 
     # 7. Recommendation
-    recommend_feature_changes(predicted_co2, co2_target, feature_selection)
+    def predict_fn(indiv_changes):
+        model_rf = joblib.load("./Predict_Linear/co2_model_rf.joblib")
+        scaler_x = joblib.load("./Predict_Linear/scaler_x.joblib")
+
+        x = seq_data[FEATURE_CORE].to_numpy().copy()[-1].copy()
+        for f, pct in indiv_changes.items():
+            idx = FEATURE_CORE.index(f)
+            x[idx] *= (1 + pct/100.0)
+
+        x_df_scale = pd.DataFrame([x], columns=FEATURE_CORE)
+
+        x_scaled = scaler_x.transform(x_df_scale)
+        pred = model_rf.predict(x_scaled)[0]
+        return pred
+        # seq_mod = seq_features.copy()
+
+        # for f, pct in indiv_changes.items():
+        #     idx = FEATURE.index(f)
+        #     seq_mod[-1, idx] *= (1 + pct / 100.0)
+
+        # return predict_co2(model, le, scaler, country, seq_mod)
+    print("Dang kiem tra...", end="", flush=True)
+    best_change, best_fitness, best_predicted_co2 = ga_optimize_changes(feature_selection=feature_selection, predict_fn=predict_fn, predicted_co2=predicted_co2, co2_target=co2_target)
+
+    print("\rCo ket qua roi!           ") 
+    print(best_change)
+    print(best_fitness)
+    print(best_predicted_co2)
+    
+    # recommend_feature_changes(predicted_co2, co2_target, feature_selection)
 
 if __name__ == "__main__":
     main()
