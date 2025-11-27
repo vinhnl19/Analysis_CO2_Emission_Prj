@@ -5,7 +5,10 @@ from tensorflow.keras.models import load_model
 import joblib
 import numpy as np
 import yaml
+import time
 from ga_optimizer import ga_optimize_changes
+from es_optimizer import es_optimize_changes
+from de_optimizer import de_optimizer_changes
 
 FEATURE = ['Co2_MtCO2',
     'Population',
@@ -90,7 +93,8 @@ def predict_co2(model, le, scaler, country_name, sequence_data_features):
     num_feature = int(sequence_data_features.shape[1])
 
     seq_df = pd.DataFrame(sequence_data_features, columns=FEATURE)
-    seq_scaled = scaler.transform(seq_df)
+    seq_df_log = np.log1p(seq_df)
+    seq_scaled = scaler.transform(seq_df_log)
     X_new = np.expand_dims(seq_scaled, axis=0)
 
     if country_name not in le.classes_:
@@ -105,6 +109,7 @@ def predict_co2(model, le, scaler, country_name, sequence_data_features):
     y_pred_real = scaler.inverse_transform(
         np.concatenate([y_pred_scaled, np.zeros((1, num_feature - 1))], axis=1)
     )[0, 0]
+    y_pred_real = np.expm1(y_pred_real)
     return y_pred_real
 
 def recommend_feature_changes(predicted_co2, co2_target, feature_selection):
@@ -128,8 +133,8 @@ def main():
         cost_guide = yaml.safe_load(f)
     
 
-    model_path = os.path.join(os.path.dirname(__file__), "../Model/best_model_gru3.keras")
-    scaler_path = os.path.join(os.path.dirname(__file__), "../Model/scaler_minmax.save")
+    model_path = os.path.join(os.path.dirname(__file__), "../Model/model_gru3.keras")
+    scaler_path = os.path.join(os.path.dirname(__file__), "../Model/scaler_quantile.save")
     le_path = os.path.join(os.path.dirname(__file__), "../Model/labelencoder_country.save")
     model = load_model(model_path)
     scaler = joblib.load(scaler_path)
@@ -158,8 +163,9 @@ def main():
 
     # 7. Recommendation
     def predict_fn(indiv_changes):
-        model_rf = joblib.load("./Predict_Linear/co2_model_rf.joblib")
-        scaler_x = joblib.load("./Predict_Linear/scaler_x.joblib")
+        # model_rf = joblib.load("./XGBoost/XGBoost_Model.pkl")
+        # scaler_x = joblib.load("./Predict_Linear/scaler_x.joblib")
+        model_xgb = joblib.load("./XGBoost/Model_XGBoost.joblib")
 
         x = seq_data[FEATURE_CORE].to_numpy().copy()[-1].copy()
         for f, pct in indiv_changes.items():
@@ -168,8 +174,8 @@ def main():
 
         x_df_scale = pd.DataFrame([x], columns=FEATURE_CORE)
 
-        x_scaled = scaler_x.transform(x_df_scale)
-        pred = model_rf.predict(x_scaled)[0]
+        # x_scaled = scaler_x.transform(x_df_scale)
+        pred = model_xgb.predict(x_df_scale)[0]
         return pred
         # seq_mod = seq_features.copy()
 
@@ -179,9 +185,13 @@ def main():
 
         # return predict_co2(model, le, scaler, country, seq_mod)
     print("Dang kiem tra...", end="", flush=True)
-    best_change, best_fitness, best_predicted_co2 = ga_optimize_changes(feature_selection=feature_selection, predict_fn=predict_fn, predicted_co2=predicted_co2, co2_target=co2_target)
+    start = time.time()
+    best_change, best_fitness, best_predicted_co2 = de_optimizer_changes(feature_selection=feature_selection, predict_fn=predict_fn, predicted_co2=predicted_co2, co2_target=co2_target)
+    end = time.time()
+    elapsed = end - start
 
     print("\rCo ket qua roi!           ") 
+    print(f"Thời gian thực thi: {elapsed:.4f} giây")
     print(best_change)
     print(best_fitness)
     print(best_predicted_co2)
