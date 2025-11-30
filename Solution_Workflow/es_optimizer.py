@@ -6,8 +6,8 @@ ES_C_INC = 1.2
 ES_C_DEC = 0.6
 def es_optimize_changes(
         feature_selection,
+        fixed_features,
         predict_fn,
-        predicted_co2,
         co2_target
 ):
     np.random.seed(42)
@@ -16,46 +16,40 @@ def es_optimize_changes(
 
     lower_bound = []
     upper_bound = []
-    max_change = []
-    cost_levels = []
+    feature_names = []
 
-    for f in feature_selection:
-        max_pct = feature_selection[f]["max_change_pct"]
-        cost_levels.append(feature_selection[f]["cost"])
-        max_change.append(max_pct)
-        lower_bound.append(-max_pct)
-        upper_bound.append(max_pct)
+    for item in feature_selection:
+        feature_names.append(item["feature"])
+        lower_bound.append(item["min_pct"])
+        upper_bound.append(item["max_pct"])
 
     lower_bound = np.array(lower_bound)
     upper_bound = np.array(upper_bound)
-    max_change = np.array(max_change)
-    cost_levels = np.array(cost_levels)
 
     mu = np.zeros(dims)
 
-    mu_fitness = predicted_co2 - co2_target
+    mu_fitness = float('inf')
 
     sigma = ES_SIGMA_INIT
-    eval_count = 1
+    eval_count = 0
 
     def indiv_to_dict(indiv):
-        return {f: indiv[i] for i, f in enumerate(feature_selection)}
+        return {feature_names[i]: indiv[i] for i in range(dims)}
     
     def evaluate(indiv):
         f_dict = indiv_to_dict(indiv)
-        pred = predict_fn(f_dict)
+        pred, x = predict_fn(f_dict, fixed_features)
 
         if pred > co2_target:
             error = 10 * (pred - co2_target)
         else:
             error = co2_target - pred
         
-        penalty = np.sum(cost_levels * (np.abs(indiv) / max_change))
-
-        fitness = error + 0.1 * penalty
-        return fitness, pred
+        fitness = error
+        return fitness, pred, x
     
-    best_predicted = predicted_co2
+    best_predicted = float('inf')
+    best_x = None
     
     while eval_count < ES_EVAL_LIMIT:
         epsilon = np.random.randn(ES_POP_SIZE, dims)
@@ -65,10 +59,12 @@ def es_optimize_changes(
 
         fitness = []
         preds = []
+        xs = []
         for i in range(ES_POP_SIZE):
-            fit, pred = evaluate(offsping[i])
+            fit, pred, x = evaluate(offsping[i])
             fitness.append(fit)
             preds.append(pred)
+            xs.append(x)
 
         fitness = np.array(fitness)
         preds = np.array(preds)
@@ -78,11 +74,13 @@ def es_optimize_changes(
         best_child = offsping[best_idx]
         best_fit = fitness[best_idx]
         best_pred = preds[best_idx]
+        best_child_x = xs[best_idx]
 
         if best_fit <= mu_fitness:
             mu = best_child.copy()
             mu_fitness = best_fit
             best_predicted = best_pred
+            best_x = best_child_x.copy()
             sigma *= ES_C_INC
         else:
             sigma *= ES_C_DEC
@@ -92,5 +90,5 @@ def es_optimize_changes(
     
     best_change = indiv_to_dict(mu)
 
-    return best_change, mu_fitness, best_predicted
+    return best_change, mu_fitness, best_predicted, best_x
 

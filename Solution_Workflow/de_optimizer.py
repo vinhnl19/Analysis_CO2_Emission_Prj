@@ -7,8 +7,8 @@ DE_CROSSOVER_RATE = 0.7
 
 def de_optimizer_changes(
         feature_selection,
+        fixed_features,
         predict_fn,
-        predicted_co2,
         co2_target,
 ):
     np.random.seed(42)
@@ -17,58 +17,56 @@ def de_optimizer_changes(
 
     lower_bound = []
     upper_bound = []
-    max_change = []
-    cost_levels = []
 
-    for f in feature_selection:
-        max_pct = feature_selection[f]["max_change_pct"]
-        cost_levels.append(feature_selection[f]["cost"])
-        max_change.append(max_pct)
-        lower_bound.append(-max_pct)
-        upper_bound.append(max_pct)
+    feature_names = []
+
+    for item in feature_selection:
+        feature_names.append(item["feature"])
+        lower_bound.append(item["min_pct"])
+        upper_bound.append(item["max_pct"])
 
     
 
     lower_bound = np.array(lower_bound)
     upper_bound = np.array(upper_bound)
-    max_change = np.array(max_change)
-    cost_levels = np.array(cost_levels)
     diff = upper_bound - lower_bound
 
     pop = lower_bound + diff * np.random.rand(DE_POP_SIZE, dims)
 
     def indiv_to_dict(indiv):
-        return {f: indiv[i] for i, f in enumerate(feature_selection)}
+        return {feature_names[i]: indiv[i] for i in range(dims)}
     
     def evaluate(indiv):
         indiv_dict = indiv_to_dict(indiv)
-        pred = predict_fn(indiv_dict)
+        pred, x = predict_fn(indiv_dict, fixed_features)
 
         if pred > co2_target:
             error = 10 * (pred - co2_target)
         else:
             error = co2_target - pred
         
-        penalty = np.sum(cost_levels * (np.abs(indiv) / max_change))
-
-        fitness = error + 0.1 * penalty
-        return fitness, pred
+        fitness = error
+        return fitness, pred, x
     
     fitness = []
     preds = []
+    xs = []
     for ind in pop:
-        fit, pred = evaluate(ind)
+        fit, pred, x = evaluate(ind)
         fitness.append(fit)
         preds.append(pred)
+        xs.append(x)
 
     fitness = np.array(fitness)
     preds = np.array(preds)
+    xs = np.array(xs)
     eval_count = DE_POP_SIZE
 
     best_idx = np.argmin(fitness)
     best_ind = pop[best_idx]
     best_fit = fitness[best_idx]
     best_pred = preds[best_idx]
+    best_x = xs[best_idx]
 
     max_gens = max(1, DE_EVAL_LIMIT // DE_POP_SIZE)
 
@@ -89,7 +87,7 @@ def de_optimizer_changes(
 
             trial = np.where(cross_points, mutant, pop[i])
 
-            trial_fit, trial_pred = evaluate(trial)
+            trial_fit, trial_pred, trial_x = evaluate(trial)
             eval_count +=1
 
             if trial_fit < fitness[i]:
@@ -102,10 +100,11 @@ def de_optimizer_changes(
                     best_ind = trial.copy()
                     best_fit = trial_fit
                     best_pred = trial_pred
+                    best_x = trial_x
 
         if best_pred <= co2_target:
             break
 
     best_change = indiv_to_dict(best_ind)
 
-    return best_change, best_fit, best_pred
+    return best_change, best_fit, best_pred, best_x
