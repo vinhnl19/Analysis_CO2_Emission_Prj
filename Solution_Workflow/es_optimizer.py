@@ -1,4 +1,44 @@
 import numpy as np
+
+# Example input
+# - feature_selection : array
+#             [
+#             {
+#                 "feature": "GDP",
+#                 "min_pct": -30,
+#                 "max_pct": 30
+#             },
+#             {
+#                 "feature": "Industry_on_GDP",
+#                 "min_pct": -30,
+#                 "max_pct": 30
+#             },
+#             {
+#                 "feature": "Government_Expenditure_on_Education",
+#                 "min_pct": -40,
+#                 "max_pct": 40
+#             },
+#             {
+#                 "feature": "HDI",
+#                 "min_pct": -30,
+#                 "max_pct": 30
+#             },
+#             {
+#                 "feature": "Deforest_Percent",
+#                 "min_pct": -10,
+#                 "max_pct": 10
+#             }
+#             ]
+
+
+# - fixed_features: object
+#         {
+#         'Population': 99680655.0,
+#         'Global_Climate_Risk_Index': np.float64(24.96427780523564),
+#         'Renewable_Energy_Percent': 12.0,
+#         'Energy_Capita_kWh': np.float64(29270.103912254795)
+#         }
+
 ES_POP_SIZE = 100
 ES_EVAL_LIMIT = 20000
 ES_SIGMA_INIT = 5.0

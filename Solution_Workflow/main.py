@@ -242,6 +242,9 @@ def main():
             end = time.time()
             elapsed = end - start
 
+            print(feature_selection)
+            print(fixed_features)
+
             print("\rCo ket qua roi!           ") 
             print(f"Thời gian thực thi: {elapsed:.4f} giây")
             print(f"Giá trị % cần thay đổi: {best_change} ")
