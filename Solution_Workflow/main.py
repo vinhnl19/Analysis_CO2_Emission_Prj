@@ -53,7 +53,7 @@ def select_year():
             print("Năm không hợp lệ, thử lại.")
 
 
-def load_sequence_data(df, country, target_year, seq_len=5):
+def load_sequence_data(df, country, target_year, seq_len=3):
     # Lấy dữ liệu seq_len năm trước target_year
     years = [target_year - i - 1 for i in reversed(range(seq_len))]
     seq_data = df[(df['Country'] == country) & (df['Year'].isin(years))].sort_values('Year')
@@ -176,7 +176,7 @@ def main():
     # 1. Load data, model, scaler, le và cost guide
     df = pd.read_csv("../Data/filled_data.csv")    
 
-    model_path = os.path.join(os.path.dirname(__file__), "../Model/Final/best_model_gru5_final.keras")
+    model_path = os.path.join(os.path.dirname(__file__), "../Model/Final/best_model_gru3_final.keras")
     scaler_path = os.path.join(os.path.dirname(__file__), "../Model/Final/scaler_quantile.save")
     le_path = os.path.join(os.path.dirname(__file__), "../Model/Final/labelencoder_country.save")
     model = load_model(model_path)
