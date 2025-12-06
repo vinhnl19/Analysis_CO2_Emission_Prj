@@ -48,7 +48,8 @@ def es_optimize_changes(
         feature_selection,
         fixed_features,
         predict_fn,
-        co2_target
+        co2_target,
+        country_name
 ):
     np.random.seed(42)
     
@@ -78,7 +79,7 @@ def es_optimize_changes(
     
     def evaluate(indiv):
         f_dict = indiv_to_dict(indiv)
-        pred, x = predict_fn(f_dict, fixed_features)
+        pred, x = predict_fn(f_dict, fixed_features, country_name)
 
         if pred > co2_target:
             error = 10 * (pred - co2_target)

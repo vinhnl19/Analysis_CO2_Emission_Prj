@@ -182,7 +182,9 @@ def main():
     model = load_model(model_path)
     scaler = joblib.load(scaler_path)
     le = joblib.load(le_path)
-    model_xgb = joblib.load("./XGBoost/Model_XGBoost.joblib")
+    # model_xgb = joblib.load("./XGBoost/Model_XGBoost.joblib")
+    model_xgb = joblib.load("./XGBoost/Model_XGBoost_Final.joblib")
+    le_xgb = joblib.load("./XGBoost/Encoder_Country_Final.joblib")
 
     countries = df['Country'].unique().tolist()
 
@@ -210,7 +212,7 @@ def main():
 
             feature_selection, fixed_features = select_changeable_features(FEATURE_CORE, seq_data=seq_data, country_name=country)
 
-            def predict_fn(indiv_changes, fixed_features):
+            def predict_fn(indiv_changes, fixed_features, country_name):
                 x_values = {}
                 x_full = []
 
@@ -228,6 +230,11 @@ def main():
                 
                 x_df_scale = pd.DataFrame([x_full], columns=FEATURE_CORE)
 
+                if country_name in le_xgb.classes_:
+                    x_df_scale['Country_Encoded'] = le_xgb.transform([country_name])
+                else:
+                    x_df_scale['Country_Encoded'] = -1
+
                 pred = model_xgb.predict(x_df_scale)[0]
 
                 return pred, x_values
@@ -238,7 +245,8 @@ def main():
                                                                         feature_selection=feature_selection, 
                                                                         fixed_features=fixed_features,
                                                                         predict_fn=predict_fn, 
-                                                                        co2_target=co2_target)
+                                                                        co2_target=co2_target,
+                                                                        country_name=country)
             end = time.time()
             elapsed = end - start
 
@@ -268,6 +276,11 @@ def main():
                         print("Giá trị không hợp lệ, hãy nhập số.")
 
             x_df = pd.DataFrame([user_features], columns=FEATURE_CORE)
+
+            if country in le_xgb.classes_:
+                x_df['Country_Encoded'] = le_xgb.transform([country])
+            else:
+                x_df['Country_Encoded'] = -1
             predicted_co2 = model_xgb.predict(x_df)[0]
 
             print(f"\nPredicted CO2 với giá trị nhập vào: {predicted_co2:.2f}")
