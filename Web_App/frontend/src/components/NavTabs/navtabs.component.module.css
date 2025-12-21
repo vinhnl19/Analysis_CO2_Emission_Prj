@@ -1,0 +1,48 @@
+.navbarTabs :global(.ant-tabs-ink-bar) {
+  top: 0;
+  bottom: auto;
+  background-color: #1d6729;
+}
+
+.navbarTabs :global(.ant-tabs-tab) {
+  background-color: #ecfeee;
+  color: #033e0c;
+  padding: 13px 30px;
+  font-weight: 500;
+}
+.navbarTabs :global(.ant-tabs-tab + .ant-tabs-tab) {
+  margin: 0;
+}
+
+.navbarTabs :global(.ant-tabs-tab:hover) {
+  color: #1d6729;
+}
+
+.navbarTabs :global(.ant-tabs-tab-active) {
+  background-color: #ffffff;
+}
+
+.navbarTabs :global(.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn) {
+    color: #187841;
+    font-weight: 700;
+}
+
+.navbarTabs :global(.ant-tabs-nav) {
+  margin-bottom: 0;
+}
+.navbarTabs :global(.ant-tabs-nav::before) {
+  border-bottom: none
+}
+.navbarTabs :global(.ant-tabs-tab) {
+  position: relative;
+}
+.navbarTabs
+  :global(.ant-tabs-tab:not(.ant-tabs-tab-active))
+  + :global(.ant-tabs-tab:not(.ant-tabs-tab-active)) {
+  border-left: 1px solid #1d6729;
+}
+
+.navbarTabs
+  :global(.ant-tabs-tab:not(.ant-tabs-tab-active):hover) {
+  background-color: #d6f5dc; /* xanh đậm hơn #ecfeee một chút */
+}

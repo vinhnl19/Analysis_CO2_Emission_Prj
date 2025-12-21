@@ -1,0 +1,24 @@
+:root {
+  --tab-bg: #ecfeee;
+  --tab-text: #033e0c;
+  --tab-active: #1d6729;
+}
+body {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+.app-header,
+.app-content, .app-function-tabs {
+  padding: 24px;
+  padding-bottom: 0;
+}
+
+.app-footer {
+  padding: 6px 24px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+.app-divider {
+  margin: 0;
+  border-top: 1px solid #1d6729;
+}

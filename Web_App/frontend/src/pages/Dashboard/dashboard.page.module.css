@@ -1,0 +1,12 @@
+.labelInputFilter {
+    color: #1d6729
+}
+.sliderMark {
+  color: #1d6729;
+  font-weight: 500;
+  font-size: 12px;
+}
+.statCardWrapper {
+  width: 280px;      /* width chuẩn cho KPI card */
+  flex: 0 0 280px;   /* không co, không giãn */
+}

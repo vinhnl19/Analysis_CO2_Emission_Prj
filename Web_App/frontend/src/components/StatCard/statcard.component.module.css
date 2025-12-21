@@ -1,0 +1,12 @@
+.valueCard, .unitCard {
+    font-size: 20px;
+    color: #000;
+    white-space: nowrap;
+}
+.descriptionCard {
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #565d6d
+}
