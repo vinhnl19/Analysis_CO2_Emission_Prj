@@ -1,8 +1,8 @@
 # backend/app/api.py
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from .models import SeqPredictReq, ManualPredictReq, RecommendReq
-from .engine import predict_sequence, predict_manual, recommend_changes_es
+from .models import SeqPredictReq, ManualPredictReq, RecommendReq, GetDataCardReq
+from .engine import predict_sequence, predict_manual, recommend_changes_es, get_country_list
 
 app = FastAPI(title="CO2 Advisor API", version="1.0")
 
@@ -55,3 +55,13 @@ def api_recommend(req: RecommendReq):
         return result
     except Exception as e:
         raise HTTPException(500, str(e))
+    
+
+@app.get("/get-country-list")
+def api_get_country_list():
+    try:
+        result = get_country_list()
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+    

@@ -15,3 +15,11 @@ class RecommendReq(BaseModel):
     feature_selection: List[Dict[str, Any]]  # [{"feature", "min_pct", "max_pct"}]
     fixed_features: Dict[str, float]         # {"Population": ..., "GDP": ...}
     co2_target: float
+class CountryOut(BaseModel):
+    country_code: str
+    country_name: str
+    continent: str
+class GetDataCardReq(BaseModel):
+    country_code_list: List[str]
+    fromYear: int
+    toYear: int

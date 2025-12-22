@@ -148,3 +148,42 @@ def recommend_changes_es(country, feature_selection, fixed_features, co2_target)
         "best_predicted_co2": float(best_pred),
         "best_x": best_x
     }
+# ==========================================================
+# ================== 4) GET COUNTRY LIST =======================
+# ==========================================================
+def get_country_list():
+    country_df = (
+        df[['Country', 'ISO_Code', 'Continent']]
+        .dropna(subset=['Country', 'ISO_Code', 'Continent'])
+        .drop_duplicates(subset=['Country'])
+        .sort_values('Country')
+    )
+
+    return [
+        {
+            "country_name": row['Country'],
+            "country_code": row['ISO_Code'],
+            "continent": row['Continent']
+        }
+        for _, row in country_df.iterrows()
+    ]
+
+# ==========================================================
+# ================== 5) GET DATA FOR CARD DASHBOARD =======================
+# ==========================================================
+def get_data_cards(vountry_codes: list, fromYear, toYear):
+    country_df = (
+        df[['Country', 'ISO_Code', 'Continent']]
+        .dropna(subset=['Country', 'ISO_Code', 'Continent'])
+        .drop_duplicates(subset=['Country'])
+        .sort_values('Country')
+    )
+
+    return [
+        {
+            "country_name": row['Country'],
+            "country_code": row['ISO_Code'],
+            "continent": row['Continent']
+        }
+        for _, row in country_df.iterrows()
+    ]
