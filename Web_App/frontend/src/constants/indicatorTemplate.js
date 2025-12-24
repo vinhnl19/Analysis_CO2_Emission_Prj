@@ -5,20 +5,23 @@ export const INDICATOR_TEMPLATE = [
     description: 'Total CO2 Emissions',
     unit: 'MtCO2',
     value: null,
+    calculationNote: "No data available for the selected filters."
   },
   {
     key: 'co2capita',
     iconMapping: 'co2capita',
     description: 'CO2 per Capita',
-    unit: 'people',
+    unit: 'tCO2',
     value: null,
+    calculationNote: "No data available for the selected filters."
   },
   {
     key: 'population',
     iconMapping: 'population',
     description: 'Population',
-    unit: 'dân',
+    unit: 'people',
     value: null,
+    calculationNote: "No data available for the selected filters."
   },
     {
     key: 'gdp',
@@ -26,13 +29,15 @@ export const INDICATOR_TEMPLATE = [
     description: 'GDP',
     unit: '$',
     value: null,
+    calculationNote: "No data available for the selected filters."
   },
     {
     key: 'education',
     iconMapping: 'education',
     description: 'Government Expenditure on Education',
-    unit: '$',
+    unit: '% GDP',
     value: null,
+    calculationNote: "No data available for the selected filters."
   },
     {
     key: 'energy',
@@ -40,6 +45,7 @@ export const INDICATOR_TEMPLATE = [
     description: 'Total Energy',
     unit: 'MWh',
     value: null,
+    calculationNote: "No data available for the selected filters."
   },
     {
     key: 'cri',
@@ -47,6 +53,7 @@ export const INDICATOR_TEMPLATE = [
     description: 'CRI',
     unit: '',
     value: null,
+    calculationNote: "No data available for the selected filters."
   },
     {
     key: 'area',
@@ -54,6 +61,7 @@ export const INDICATOR_TEMPLATE = [
     description: 'Area',
     unit: 'ha',
     value: null,
+    calculationNote: "No data available for the selected filters."
   },
       {
     key: 'hdi',
@@ -61,5 +69,6 @@ export const INDICATOR_TEMPLATE = [
     description: 'HDI',
     unit: '',
     value: null,
+    calculationNote: "No data available for the selected filters."
   },
 ]

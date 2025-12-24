@@ -148,6 +148,7 @@ export default function DashboardPage() {
               value={item?.value}
               unitName={item?.unit}
               description={item?.description}
+              calculationNote={item?.calculationNote}
             />
           </div>
         ))}

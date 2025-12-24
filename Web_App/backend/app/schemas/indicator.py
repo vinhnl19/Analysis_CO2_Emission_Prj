@@ -10,3 +10,4 @@ class IndicatorDataOut(BaseModel):
     unit: str
     description: str
     iconMapping: str
+    calculationNote: str

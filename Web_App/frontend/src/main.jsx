@@ -60,6 +60,22 @@ createRoot(document.getElementById('root')).render(
               paddingLG: '16px',
               paddingSM: '12px'
             },
+            Tooltip: {
+              colorBgSpotlight: "#1f4f3a",     // nền tooltip
+              colorTextLightSolid: "#ecfeee",  // chữ
+              borderRadius: 8,
+              paddingSM: 12,
+              fontSize: 13,
+              lineHeight: 1.5,
+            },
+            Popover: {
+              colorBgElevated: "#1f4f3a", // nền popover
+              colorText: "#ecfeee",       // màu chữ
+              colorTextHeading: "#ecfeee",
+              fontWeightStrong: 700,
+              borderRadiusLG: 12,
+              boxShadow: "0 8px 24px rgba(0,0,0,0.25)"
+            }
           }
         }}
       >

@@ -1,7 +1,7 @@
 import Card from "antd/es/card/Card"
 import styles from "./statcard.component.module.css"
-import { Flex, Space, Typography, Skeleton } from "antd"
-import { InfoCircleOutlined } from '@ant-design/icons'
+import { Flex, Space, Typography, Skeleton, Popover } from "antd"
+import { InfoCircleOutlined, InfoCircleTwoTone } from '@ant-design/icons'
 import { indicatorIconMap } from "../../constants/indicatorIconMap"
 import { formatNumber } from "../../utils/formatNumber"
 
@@ -12,6 +12,7 @@ export default function StatCardComponent(
         value,
         unitName,
         description,
+        calculationNote,
         loading = false
     }) {
     const defaultIcon = <InfoCircleOutlined style={{ fontSize: '24px', color: '#1890ff' }} />;
@@ -44,9 +45,28 @@ export default function StatCardComponent(
                         <Skeleton.Input active size="small" style={{ width: 220, height: '16px' }} />
                     </div>
                 ) : (
-                    <Text className={styles.descriptionCard}>
-                        {description}
-                    </Text>
+                    <Space>
+                        <Text className={styles.descriptionCard}>
+                            {description}
+                        </Text>
+                        {calculationNote && (
+                            <Popover
+                                title="Calculation Details"
+                                content={
+                                    <div className={styles.popoverContent}>
+                                        {calculationNote}
+                                    </div>
+                                }
+                                placement="top"
+                                trigger="hover"
+                            >
+                                <InfoCircleTwoTone
+                                    style={{ fontSize: 12, cursor: 'pointer' }}
+                                />
+                            </Popover>
+
+                        )}
+                    </Space>
                 )}
             </Flex>
         </Card>
