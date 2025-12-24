@@ -1,8 +1,8 @@
 import { apiClient } from "./apiClient";
 
-export const getIndicatorCardData = async (countries, fromYear, toYear) => {
+export const getIndicatorCardData = async ({country_code_list, fromYear, toYear}) => {
     const payload = {
-        country_code_list: countries,
+        country_code_list: country_code_list,
         fromYear: fromYear,
         toYear: toYear
     }

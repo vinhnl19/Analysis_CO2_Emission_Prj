@@ -7,3 +7,11 @@
   width: 280px;      /* width chuẩn cho KPI card */
   flex: 0 0 280px;   /* không co, không giãn */
 }
+.statCardWrapper {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.statCardWrapper.loading {
+  opacity: 0.6;
+  transform: translateY(4px);
+}

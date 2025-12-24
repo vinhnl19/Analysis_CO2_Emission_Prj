@@ -2,10 +2,10 @@ import { Select, Form, Slider, Typography, Row, Col, Flex } from 'antd'
 import styleDashboard from "./dashboard.page.module.css"
 import '../../styles/typography.css'
 import StatCardComponent from '../../components/StatCard/statcard.component'
-import { GlobalOutlined } from '@ant-design/icons'
-import { useCountries } from '../../hooks/useCountries'
 import { useEffect } from 'react'
+import { useCountries } from '../../hooks/useCountries'
 import { useIndicatorCards } from '../../hooks/useIndicators'
+import { useRangeYear } from '../../hooks/useRangeYear'
 
 const { Text } = Typography
 
@@ -14,6 +14,10 @@ export default function DashboardPage() {
   const [form] = Form.useForm()
   const selectedContinents = Form.useWatch('continent', form)
   const selectedCountries = Form.useWatch('country', form)
+  const selectedPeriod = Form.useWatch('period', form)
+
+  
+  // Ràng buộc 2 select country & continent
   const continentOptions = Array.from(
     new Set(dataCoCo?.map(item => item.continent))
   ).map(cont => ({
@@ -55,82 +59,32 @@ export default function DashboardPage() {
 
   }, [selectedContinents, selectedCountries, dataCoCo, form])
 
-  //fixed payload
-  const fixedPayload = {
-    country_code_list: ["CHN"],
-    fromYear: 2020,
-    toYear: 2020
+  
+  // Get data indicator card
+  const indicatorPayload = {
+    country_code_list: selectedCountries ?? [],
+    fromYear: selectedPeriod?.[0],
+    toYear: selectedPeriod?.[1]
   }
-  const { data: dataIndicators, isLoading: isLoadingIndicators } = useIndicatorCards(
-    fixedPayload.country_code_list, fixedPayload.fromYear, fixedPayload.toYear
-  )
+  const { data: dataIndicators, isFetching: isFetchingIndicators } = useIndicatorCards(indicatorPayload)
 
   // fixed data
-  const fixedMinYear = 2001
-  const fixedMaxYear = 2022
+  const { data: dataRangeYear } = useRangeYear()
+  let minYear = dataRangeYear?.minYear
+  let maxYear = dataRangeYear?.maxYear
   const fixedMarksYear = {
-    [fixedMinYear]: <span className={styleDashboard.sliderMark}>{fixedMinYear}</span>,
-    [fixedMaxYear]: <span className={styleDashboard.sliderMark}>{fixedMaxYear}</span>
+    [minYear]: <span className={styleDashboard.sliderMark}>{minYear}</span>,
+    [maxYear]: <span className={styleDashboard.sliderMark}>{maxYear}</span>
   }
-  const dataStatCard = [
-    {
-      icon: <GlobalOutlined style={{ fontSize: 24, color: '#0D59F2' }} />,
-      value: "5200",
-      unitName: "MtCO2",
-      description: "Total CO₂ Emissions"
-    },
-    {
-      icon: <GlobalOutlined style={{ fontSize: 24, color: '#0D59F2' }} />,
-      value: "15.7",
-      unitName: "tCO2",
-      description: "CO₂ per Capita"
-    },
-    {
-      icon: <GlobalOutlined style={{ fontSize: 24, color: '#0D59F2' }} />,
-      value: "26.9",
-      unitName: "Tỉ",
-      description: "Population"
-    },
-    {
-      icon: <GlobalOutlined style={{ fontSize: 24, color: '#0D59F2' }} />,
-      value: "0.93",
-      unitName: "$",
-      description: "GDP"
-    },
-    {
-      icon: <GlobalOutlined style={{ fontSize: 24, color: '#0D59F2' }} />,
-      value: "0.93",
-      unitName: "$",
-      description: "Government Expenditure on Education"
-    }, {
-      icon: <GlobalOutlined style={{ fontSize: 24, color: '#0D59F2' }} />,
-      value: "5200",
-      unitName: "MtCO2",
-      description: "Total Energy "
-    }, {
-      icon: <GlobalOutlined style={{ fontSize: 24, color: '#0D59F2' }} />,
-      value: "5200",
-      unitName: "MWh",
-      description: "Total CO₂ Emissions"
-    }, {
-      icon: <GlobalOutlined style={{ fontSize: 24, color: '#0D59F2' }} />,
-      value: "15.7",
-      unitName: "",
-      description: "CRI"
-    }, {
-      icon: <GlobalOutlined style={{ fontSize: 24, color: '#0D59F2' }} />,
-      value: "26.9",
-      unitName: "Ha",
-      description: "Area"
-    }
-  ]
   // filter option
   const filterOptionFunc = (input, option) => {
     return (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
   }
   return (
     <div>
-      <Form layout='vertical' form={form}>
+      <Form 
+        layout='vertical' 
+        form={form}>
         {/* Label */}
         <Row gutter={24} style={{ marginBottom: '6px' }}>
           <Col span={6}>
@@ -171,11 +125,11 @@ export default function DashboardPage() {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item name="period">
+            <Form.Item name="period" initialValue={[minYear, maxYear]}>
               <Slider
                 range
-                min={fixedMinYear}
-                max={fixedMaxYear}
+                min={minYear}
+                max={maxYear}
                 step={1}
                 marks={fixedMarksYear}
               />
@@ -184,14 +138,16 @@ export default function DashboardPage() {
         </Row>
       </Form>
       <Flex wrap gap="small" align='middle' justify='center'>
-        {dataIndicators?.map((item, index) => (
-          <div key={index} className={styleDashboard.statCardWrapper}>
+        {(isFetchingIndicators ? Array.from({ length: 9 }) : dataIndicators)?.map((item, index) => (
+          <div key={index} className={`${styleDashboard.statCardWrapper} ${isFetchingIndicators ? styleDashboard.loading : ''
+            }`}>
             <StatCardComponent
               key={index}
-              icon={item.icon}
-              value={item.value}
-              unitName={item.unit}
-              description={item.description}
+              loading={isFetchingIndicators}
+              icon={item?.iconMapping}
+              value={item?.value}
+              unitName={item?.unit}
+              description={item?.description}
             />
           </div>
         ))}

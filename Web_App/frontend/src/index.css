@@ -22,3 +22,8 @@ body {
   margin: 0;
   border-top: 1px solid #1d6729;
 }
+/* statcard-icon.css */
+.statcard-icon {
+    font-size: 24px;
+    color: #0D59F2;
+}

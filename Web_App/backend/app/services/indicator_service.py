@@ -6,47 +6,56 @@ def get_indicator_data(country_codes: List[str], fromYear: int, toYear: int):
         {
             "name": "Co2_MtCO2",
             "unit": "MtCO2",
-            "description": "Total CO2 Emissions"
+            "description": "Total CO2 Emissions",
+            "iconMapping": "co2global"
         },
         {
             "name": "Co2_Capita_tCO2",
             "unit": "tCO2",
             "description": "CO2 per Capita",
+            "iconMapping": "co2capita"
         },
         {
             "name": "Population",
-            "unit": "Tỷ dân",
-            "description": "Population"
+            "unit": "dân",
+            "description": "Population",
+            "iconMapping": "population"
         },
         {
             "name": "GDP",
             "unit": "$",
-            "description": "GDP"
+            "description": "GDP",
+            "iconMapping": "gdp"
         },
         {
             "name": "Government_Expenditure_on_Education",
             "unit": "$",
-            "description": "Government Expenditure on Education"
+            "description": "Government Expenditure on Education",
+            "iconMapping": "education"
         },
         {
             "name": "Energy_MWh",
             "unit": "MWh",
-            "description": "Total Energy"
+            "description": "Total Energy",
+            "iconMapping": "energy"
         },
         {
             "name": "Global_Climate_Risk_Index",
             "unit": "",
-            "description": "CRI"
+            "description": "CRI",
+            "iconMapping": "cri"
         },
         {
             "name": "Area_ha",
             "unit": "ha",
-            "description": "Area"
+            "description": "Area",
+            "iconMapping": "area"
         },
         {
             "name": "HDI",
             "unit": "",
-            "description": "HDI"
+            "description": "HDI",
+            "iconMapping": "hdi"
         },
     ]
     df_filtered = df[(df['ISO_Code'].isin(country_codes)) & (df['Year'] >= fromYear) & (df['Year'] <= toYear)]
@@ -60,6 +69,7 @@ def get_indicator_data(country_codes: List[str], fromYear: int, toYear: int):
         result.append({
             "value": value,
             "unit": indicator["unit"],
-            "description": indicator["description"]
+            "description": indicator["description"],
+            "iconMapping": indicator["iconMapping"]
         })
     return result

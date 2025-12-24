@@ -10,3 +10,11 @@
     text-overflow: ellipsis;
     color: #565d6d
 }
+.skeletonDescription {
+  margin-top: 6px;
+}
+/* .skeletonDescription :global(.ant-skeleton-input) {
+  height: 12px;  
+  min-height: 12px;
+  line-height: 12px;
+} */
