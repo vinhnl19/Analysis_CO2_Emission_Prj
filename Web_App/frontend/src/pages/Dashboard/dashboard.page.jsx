@@ -1,11 +1,12 @@
-import { Select, Form, Slider, Typography, Row, Col, Flex } from 'antd'
+import { Select, Form, Slider, Typography, Row, Col, Flex, Space } from 'antd'
 import styleDashboard from "./dashboard.page.module.css"
 import '../../styles/typography.css'
 import StatCardComponent from '../../components/StatCard/statcard.component'
 import { useEffect } from 'react'
 import { useCountries } from '../../hooks/useCountries'
-import { useIndicatorCards } from '../../hooks/useIndicators'
+import { useGDPAllocationChart, useIndicatorCards, useDistributionEnergyChart, useDistributionLandAreaChart } from '../../hooks/useIndicators'
 import { useRangeYear } from '../../hooks/useRangeYear'
+import PieChartComponent from '../../components/charts/PieChart/piechart.component'
 
 const { Text } = Typography
 
@@ -68,7 +69,6 @@ export default function DashboardPage() {
   }
   const { data: dataIndicators, isFetching: isFetchingIndicators } = useIndicatorCards(indicatorPayload)
 
-  // fixed data
   const { data: dataRangeYear } = useRangeYear()
   let minYear = dataRangeYear?.minYear
   let maxYear = dataRangeYear?.maxYear
@@ -76,12 +76,19 @@ export default function DashboardPage() {
     [minYear]: <span className={styleDashboard.sliderMark}>{minYear}</span>,
     [maxYear]: <span className={styleDashboard.sliderMark}>{maxYear}</span>
   }
-  // filter option
   const filterOptionFunc = (input, option) => {
     return (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
   }
+
+  // Get data chart GDP Allocation
+  const { data: dataGdpAllocation, isFetching: isFetchingGdpAllocation } = useGDPAllocationChart(indicatorPayload)
+  // Get data chart Distribution Energy
+  const { data: dataDistributionEnergy, isFetching: isFetchingDistributionEnergy } = useDistributionEnergyChart(indicatorPayload)
+  // Get data chart Distribution Land Area
+  const { data: dataDistributionLandArea, isFetching: isFetchingDistributionLandArea } = useDistributionLandAreaChart(indicatorPayload)
+
   return (
-    <div>
+    <Space orientation='vertical'>
       <Form 
         layout='vertical' 
         form={form}>
@@ -153,6 +160,20 @@ export default function DashboardPage() {
           </div>
         ))}
       </Flex>
-    </div>
+      <Flex wrap gap="small" align='middle' justify='center'>
+          <div className={`${styleDashboard.pieChartWrapper} ${isFetchingGdpAllocation ? styleDashboard.loading : ''
+            }`}>
+            <PieChartComponent data={dataGdpAllocation} titleChart='GDP Allocation by Sector' loading={isFetchingGdpAllocation}></PieChartComponent>
+          </div>
+          <div className={`${styleDashboard.pieChartWrapper} ${isFetchingDistributionEnergy ? styleDashboard.loading : ''
+            }`}>
+            <PieChartComponent data={dataDistributionEnergy} titleChart='Distribution of Energy Sources' loading={isFetchingDistributionEnergy}></PieChartComponent>
+          </div>
+          <div className={`${styleDashboard.pieChartWrapper} ${isFetchingDistributionLandArea ? styleDashboard.loading : ''
+            }`}>
+            <PieChartComponent data={dataDistributionLandArea} titleChart='Distribution of Total Land Area' loading={isFetchingDistributionLandArea}></PieChartComponent>
+          </div>
+      </Flex>
+    </Space>
   )
 }

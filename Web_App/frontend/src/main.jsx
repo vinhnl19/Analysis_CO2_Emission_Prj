@@ -75,6 +75,9 @@ createRoot(document.getElementById('root')).render(
               fontWeightStrong: 700,
               borderRadiusLG: 12,
               boxShadow: "0 8px 24px rgba(0,0,0,0.25)"
+            },
+            Typography: {
+              colorText: "#033e0c"
             }
           }
         }}

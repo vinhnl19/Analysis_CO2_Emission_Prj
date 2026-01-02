@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List, Any, Optional
 from pydantic import BaseModel
 
 class GetIndicatorFromCountryReq(BaseModel):
@@ -11,3 +11,8 @@ class IndicatorDataOut(BaseModel):
     description: str
     iconMapping: str
     calculationNote: str
+class MetricShareItem(BaseModel):
+    key: str
+    label: str
+    value: Optional[float]
+    unit: str

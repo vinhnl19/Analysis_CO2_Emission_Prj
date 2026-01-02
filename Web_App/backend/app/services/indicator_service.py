@@ -239,3 +239,190 @@ def get_indicator_data(country_codes: List[str], fromYear: int, toYear: int):
             "calculationNote": calculationNote_text
         })
     return result
+
+def get_gdp_allocation(country_codes: List[str], fromYear: int, toYear: int):
+    indicators = [
+        {
+            "name": "Industry_on_GDP",
+            "label": "Industry",
+            "unit": "%"
+        },
+        {
+            "name": "Government_Expenditure_on_Education",
+            "label": "Education",
+            "unit": "%"
+        }
+    ]
+    df_filtered = df[
+        (df["ISO_Code"].isin(country_codes)) &
+        (df["Year"] >= fromYear) &
+        (df["Year"] <= toYear)
+    ]
+    if df_filtered.empty:
+        return [
+                {
+                    "key": meta["name"],
+                    "label": meta["label"],
+                    "value": None,
+                    "unit": meta["unit"]
+                }
+                for meta in indicators
+            ] + [
+                {
+                    "key": "Other",
+                    "label": "Other",
+                    "value": None,
+                    "unit": "%"
+                }
+            ]
+    
+    result = []
+    otherPercentValue = 100
+    for meta in indicators:
+        name = meta["name"]
+
+        if name not in df_filtered.columns:
+            value = None
+        else:
+            country_means = (
+                df_filtered.groupby("ISO_Code")[name]
+                .mean() # mean theo year
+            )
+
+            value = country_means.mean() # mean theo country
+
+        otherPercentValue -= value
+
+        result.append({
+            "key": name,
+            "label": meta["label"],
+            "value": round(value, 2) if value is not None else None,
+            "unit": meta["unit"]
+        })
+    
+    result.append( {
+        "key": "Other",
+        "label": "Other",
+        "value": round(otherPercentValue, 2) if value is not None else None,
+        "unit": "%"
+    })
+    
+    return result
+
+def get_distribution_energy(country_codes: List[str], fromYear: int, toYear: int):
+    indicators = [
+        {
+            "name": "Renewable_Energy_MWh",
+            "label": "Renewable Energy",
+            "unit": "MWh"
+        }
+    ]
+    TOTAL_ENERGY_COLS_NAME = "Energy_MWh"
+    df_filtered = df[
+        (df["ISO_Code"].isin(country_codes)) &
+        (df["Year"] >= fromYear) &
+        (df["Year"] <= toYear)
+    ]
+    if df_filtered.empty:
+        return [
+                {
+                    "key": meta["name"],
+                    "label": meta["label"],
+                    "value": None,
+                    "unit": meta["unit"]
+                }
+                for meta in indicators
+            ] + [
+                {
+                    "key": "Other_Energy",
+                    "label": "Other Energy",
+                    "value": None,
+                    "unit": "MWh"
+                }
+            ]
+    
+    result = []
+    otherValue = df_filtered[TOTAL_ENERGY_COLS_NAME].sum()
+    for meta in indicators:
+        name = meta["name"]
+
+        if name not in df_filtered.columns:
+            value = None
+        else:
+            value = df_filtered[name].sum()
+
+        otherValue -= value
+
+        result.append({
+            "key": name,
+            "label": meta["label"],
+            "value": round(value, 2) if value is not None else None,
+            "unit": meta["unit"]
+        })
+    
+    result.append( {
+        "key": "Other_Energy",
+        "label": "Other Energy",
+        "value": round(otherValue, 2) if value is not None else None,
+        "unit": "MWh"
+    })
+    
+    return result
+def get_distribution_land_area(country_codes: List[str], fromYear: int, toYear: int):
+    indicators = [
+        {
+            "name": "Forest_Area_ha",
+            "label": "Forest Area",
+            "unit": "hecta"
+        }
+    ]
+    TOTAL_LAND_AREA = "Area_ha"
+    df_filtered = df[
+        (df["ISO_Code"].isin(country_codes)) &
+        (df["Year"] == toYear) 
+    ] # Lấy năm mới nhất
+    if df_filtered.empty:
+        return [
+                {
+                    "key": meta["name"],
+                    "label": meta["label"],
+                    "value": None,
+                    "unit": meta["unit"]
+                }
+                for meta in indicators
+            ] + [
+                {
+                    "key": "Other_Area",
+                    "label": "Other Area",
+                    "value": None,
+                    "unit": "hecta"
+                }
+            ]
+    
+    result = []
+    otherValue = df_filtered[TOTAL_LAND_AREA].sum()
+    for meta in indicators:
+        name = meta["name"]
+
+        if name not in df_filtered.columns:
+            value = None
+        else:
+            value = df_filtered[name].sum()
+
+        otherValue -= value
+
+        result.append({
+            "key": name,
+            "label": meta["label"],
+            "value": round(value, 2) if value is not None else None,
+            "unit": meta["unit"]
+        })
+    
+    result.append( {
+        "key": "Other_Area",
+        "label": "Other Area",
+        "value": round(otherValue, 2) if value is not None else None,
+        "unit": "hecta"
+    })
+    
+    return result

@@ -5,7 +5,9 @@
 }
 .statCardWrapper {
   width: 285px;
-  flex: 0 0 285px;
+  flex-basis: 285px;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 .statCardWrapper {
   transition: opacity 0.3s ease, transform 0.3s ease;
@@ -14,4 +16,11 @@
 .statCardWrapper.loading {
   opacity: 0.6;
   transform: translateY(4px);
+}
+.pieChartWrapper {
+    max-width: calc(33.333% - 16px);
+    min-width: 285px;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: calc(33.333% - 16px);
 }
